@@ -1,2 +1,0 @@
-# letrng
-true random
