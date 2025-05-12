@@ -1,8 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define FILE_SOURCE "13million.bin"
+#define FILE_SOURCE "3340million.bin"
 #define FILE_DESTINATION "postprocessed.bin"
+
+unsigned long long rotateLeft1(unsigned long long value) {
+    const unsigned int bits = sizeof(value) * 8;
+    return (value << 1) | (value >> (bits - 1));
+}
 
 unsigned long long fold_bits(unsigned long long B) {
 	unsigned long long R = 0; // Initial value of R is not disclosed in the paper
@@ -49,11 +54,13 @@ int main(void) {
 		if (a == b) {
 			continue;
 		}
-		entropy_pool <<= 1;
 		if (a == 1)
-			entropy_pool |= 1;
+			entropy_pool ^= 0x1ULL;
 		else
-			entropy_pool |= 0;
+			entropy_pool ^= 0x0ULL;
+
+		entropy_pool = rotateLeft1(entropy_pool);
+
 		entropy_count++;
 		if (entropy_count % 64 == 0) {
 			size_t written = fwrite(&entropy_pool, sizeof(unsigned long long), 1, dst);
